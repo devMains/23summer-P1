@@ -7,7 +7,7 @@
         <meta http-equiv="Compatible" content="no-cache"/>
         <title>Document</title>
         <link rel="stylesheet"
-            href = "css/bootstrap.min.css">
+            href = "bootstrap.min.css">
     </head>
     <body>
         <nav class="navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark">
@@ -19,33 +19,20 @@
               <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
                   <li class="nav-item">
-                    <a class="nav-link" href="index.html">home</a>
+                    <a class="nav-link" href="/">home</a>
                   </li>
                   <li class="nav-item">
-                    <a class="nav-link" href="myprofile.html">profile</a>
+                    <a class="nav-link" href="/profile">profile</a>
                   </li>
                   <li class="nav-item">
                     <a class="nav-link" href="#">Features</a>
                   </li>
                 </ul>
-                <button type="button" class="btn btn-warning">Login</button>
+                <button type="button" onclick="location.href='/login'" class="btn btn-warning">Login</button>
               </div>
             </div>
         </nav>
+        <p>개인정보 확인 구역, 정보 수정, 탈퇴 기능 등</p>
 
-        <div class="card">
-            <div class="card-body">
-              <h2>자유게시판입니다.</h2>
-            </div>
-        </div>
-
-        <nav aria-label="..." style="margin:20px;">
-            <ul class="pagination pagination-lg">
-              <li class="page-item"><a class="page-link" href="#">1</a></li>
-              <li class="page-item"><a class="page-link" href="#">2</a></li>
-              <li class="page-item"><a class="page-link" href="#">3</a></li>
-            </ul>
-        </nav>
-        
     </body>
 </html>
