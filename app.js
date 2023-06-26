@@ -4,9 +4,10 @@ const port = 5000;
 const path = require('path');
 
 app.use(express.static(path.join(__dirname, 'css')));
+app.use(express.static('js'));
+app.use(express.static('img'));
 
 app.get('/', (req, res) => {
-    console.log(__dirname + "/htmls/index.html");
     res.sendFile( __dirname + "/htmls/index.html");
 });
 
@@ -15,12 +16,13 @@ app.get('/profile', (req, res) => {
 });
 
 app.get('/login', (req, res) => {
-    res.sendFile(__dirname + "/htmls/login.html");
+    res.sendFile(__dirname + "/htmls/kakao_login.html");
 });
 
 app.get('/page', (req, res) => {
     res.sendFile(__dirname + "/htmls/page.html");
 });
+
 
 app.listen(port, () => {
     console.log(`서버 실행... http://localhost:${port}`);
