@@ -55,7 +55,7 @@
                             url: '/v2/user/me',
                             success: (res) => {
                                 const kakao_account = res.kakao_account;
-                                console.log(kakao_account);
+                                console.log(kakao.Auth.getAccessToken());
                             }
                         });
                         window.location.href='/login' //리다이렉트 되는 코드

@@ -34,19 +34,129 @@
             </div>
         </nav>
 
-        <div class="card">
-            <div class="card-body">
-              <h2>자유게시판입니다.</h2>
+        <div class="container">
+          <h1>자유게시판</h1>
+          <form id="postForm">
+            <div class="form-group">
+              <label for="title">제목</label>
+              <input type="text" class="form-control" id="title" placeholder="제목을 입력하세요">
             </div>
+            <div class="form-group">
+              <label for="content">내용</label>
+              <textarea class="form-control" id="content" rows="3" placeholder="내용을 입력하세요"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">작성</button>
+          </form>
+      
+          <h2>글 목록</h2>
+          <table id="postTable" class="table">
+            <thead>
+              <tr>
+                <th>제목</th>
+                <th>내용</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- 글 목록이 여기에 동적으로 추가 -->
+            </tbody>
+          </table>
         </div>
 
-        <nav aria-label="..." style="margin:20px;">
-            <ul class="pagination pagination-lg">
-              <li class="page-item"><a class="page-link" href="#">1</a></li>
-              <li class="page-item"><a class="page-link" href="#">2</a></li>
-              <li class="page-item"><a class="page-link" href="#">3</a></li>
-            </ul>
-        </nav>
+        <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
+        <script>
+          $('document').ready(function () { 
+            updatePostTable();
+            // 글 작성 폼 제출 이벤트 핸들러
+            $("#postForm").submit(function (event) {
+              event.preventDefault();
+      
+              var title = $("#title").val();
+              var content = $("#content").val();
+      
+              var postData = {
+                title: title,
+                content: content
+              };
+      
+              $.ajax({
+                url:"/api/posts",
+                method: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(postData),
+                success: function () {
+                  console.log("success");
+                  updatePostTable();
+                },
+                error: function () {
+                  console.log("fail");
+                }
+              });
+      
+              // 폼 초기화
+              $("#title").val("");
+              $("#content").val("");
+              console.log("작성됨.");
+            });
+      
+            // 글 테이블 업데이트 함수
+            function updatePostTable() {
+            // 글 목록을 가져오는 GET 요청 보내기
+              $.ajax({
+                url: "/api/posts",
+                method: "GET",
+                success: function (data) {
+                  console.log("글 목록 가져오기 성공", data);
+      
+                  var tableBody = $("#postTable tbody");
+                  tableBody.empty();
+
+                  data.forEach(function (post) {
+                    var row = $("<tr>");
+                    row.append($("<td>").text(post.title));
+                    row.append($("<td>").text(post.content));
+                    row.append($("<td>").append(createEditButton(post._id)).append(createDeleteButton(post._id)));
+                    tableBody.append(row);
+                  });
+                },
+                error: function () {
+                  console.log("글 목록 가져오기 실패");
+                }
+              });
+            }
+      
+            function createEditButton(index) {
+              var button = $("<button>");
+              button.addClass("btn btn-sm btn-warning");
+              button.text("수정");
+              button.click(function () {
+                // 수정 로직을 여기에 구현
+                console.log("수정 버튼 클릭 - index:", index);
+              });
+              return button;
+            }
+      
+            function createDeleteButton(index) {
+              var button = $("<button>");
+              button.addClass("btn btn-sm btn-danger");
+              button.text("삭제");
+              button.click(function (id) {
+                $.ajax({
+                  url: "/api/posts/" + id,
+                  method: "DELETE",
+                  success: function () {
+                    console.log("글 삭제 성공");
+                    updatePostTable();
+                  },
+                  error: function () {
+                    console.log("글 삭제 실패");
+                  }
+                });
+              });
+              return button;
+            }
+          });
+        </script>
         
     </body>
 </html>
