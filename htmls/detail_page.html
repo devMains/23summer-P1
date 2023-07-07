@@ -9,12 +9,11 @@
         <link rel="stylesheet"
             href = "bootstrap.min.css">
         <script src="bootstrap.min.js"></script>
-        <script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
     </head>
     <body>
         <nav class="navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark">
             <div class="container-fluid">
-              <a class="navbar-brand" href="/">Batmmunity</a>
+              <a class="navbar-brand" href="#">Navbar</a>
               <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
               </button>
@@ -30,30 +29,21 @@
                     <a class="nav-link" href="#">Features</a>
                   </li>
                 </ul>
-                <button type="button" class="btn btn-warning">Login</button>
+                <button type="button" class="btn btn-warning" onclick="location.href='/login'">Login</button>
               </div>
             </div>
         </nav>
-        
-        <div style="margin :20px; border: solid; border-color: black; border-radius: 5px; padding: 5px;">
-            <form>
-                <div class="mb-3">
-                  <label for="exampleInputEmail1" class="form-label">Email address</label>
-                  <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
-                  <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
-                </div>
-                <div class="mb-3">
-                  <label for="exampleInputPassword1" class="form-label">Password</label>
-                  <input type="password" class="form-control" id="exampleInputPassword1">
-                </div>
-                <div class="mb-3 form-check">
-                  <input type="checkbox" class="form-check-input" id="exampleCheck1">
-                  <label class="form-check-label" for="exampleCheck1">Check me out</label>
-                </div>
-                <button type="submit" class="btn btn-primary">Submit</button>
-              </form>
-        </div>
 
-        <p>카카오 인증 API 사용 예정</p>
+        <table id="article">
+            <tbody>
+
+            </tbody>
+        </table>
+
+        <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
+        <script>
+            
+        </script>
+        
     </body>
 </html>

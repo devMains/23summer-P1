@@ -7,13 +7,13 @@
         <meta http-equiv="Compatible" content="no-cache"/>
         <title>Document</title>
         <link rel="stylesheet"
-            href = "bootstrap.min.css">
-        <script src="bootstrap.min.js"></script>
+            href = "/bootstrap.min.css">
+        <script src="/bootstrap.min.js"></script>
     </head>
     <body>
         <nav class="navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark">
             <div class="container-fluid">
-              <a class="navbar-brand" href="#">Navbar</a>
+              <a class="navbar-brand" href="/">Batmmunity</a>
               <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
               </button>
@@ -53,8 +53,6 @@
             <thead>
               <tr>
                 <th>제목</th>
-                <th>내용</th>
-                <th></th>
               </tr>
             </thead>
             <tbody>
@@ -73,6 +71,12 @@
       
               var title = $("#title").val();
               var content = $("#content").val();
+
+              if (title == "" || content == "") {
+                alert("비워둘 수 없습니다.");
+                return;
+              }
+              
       
               var postData = {
                 title: title,
@@ -112,10 +116,13 @@
                   tableBody.empty();
 
                   data.forEach(function (post) {
+                    var button = $("<a style='color: blue; cursor: pointer'>");
+                      button.text(post.title);
+                      button.click(function () {
+                      goToPostDetail(post._id);
+                    })
                     var row = $("<tr>");
-                    row.append($("<td>").text(post.title));
-                    row.append($("<td>").text(post.content));
-                    row.append($("<td>").append(createEditButton(post._id)).append(createDeleteButton(post._id)));
+                    row.append($('<td>').append(button));
                     tableBody.append(row);
                   });
                 },
@@ -123,6 +130,45 @@
                   console.log("글 목록 가져오기 실패");
                 }
               });
+            }
+
+            function detailPage(id) {
+
+              var button = $("<button>");
+              button.addClass("btn btn-sm btn-danger");
+              button.text("정보 전달?");
+              button.click(function() {
+                $.ajax({
+                  url: '/api/posts/',
+                  method: 'GET',
+                  dataType: 'json',
+                  data: {_id: id},
+                  success: function(data) {
+                    var title = data.filter(item => item["_id"] == id)[0]["title"]
+                    var content = data.filter(item => item["_id"] == id)[0]["content"]
+                    console.log(title, content);
+                  },
+                  error: function() {
+                    console.log("error");
+                  }
+                });
+              });
+
+              
+              return button;
+            }
+
+            function goToPostDetail(id) {
+              location.href = "/post/" + id;
+            }
+
+            function createPostDetailLink(id, title) {
+              var button = $("<a style='color: blue; cursor: pointer'>");
+                button.text(title);
+                button.click(function () {
+                  goToPostDetail(id);
+                })
+                return button;
             }
       
             function createEditButton(index) {
@@ -141,17 +187,18 @@
               button.addClass("btn btn-sm btn-danger");
               button.text("삭제");
               button.click(function (id) {
-                $.ajax({
-                  url: "/api/posts/" + id,
-                  method: "DELETE",
-                  success: function () {
-                    console.log("글 삭제 성공");
-                    updatePostTable();
-                  },
-                  error: function () {
-                    console.log("글 삭제 실패");
-                  }
-                });
+                // $.ajax({
+                //   url: "/api/posts/" + id,
+                //   method: "DELETE",
+                //   success: function () {
+                //     console.log("글 삭제 성공");
+                //     updatePostTable();
+                //   },
+                //   error: function () {
+                //     console.log("글 삭제 실패");
+                //   }
+                // });
+                alert(" ㅋㅋ 못지우지");
               });
               return button;
             }

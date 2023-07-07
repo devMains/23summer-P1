@@ -10,6 +10,9 @@ app.use(express.static('js'));
 app.use(express.static('img'));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.engine('html', require('ejs').renderFile);
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
 
 const mongoURI = "mongodb+srv://mainsdev:1q2w3e4r!@cluster0.v3mragw.mongodb.net/?retryWrites=true&w=majority"
 mongoose.connect(mongoURI, {useNewUrlParser: true, useUnifiedTopology: true})
@@ -38,6 +41,14 @@ app.get('/page', (req, res) => {
     res.sendFile(__dirname + "/htmls/page.html");
 });
 
+app.get('/delete', (req, res) => {
+    res.sendFile(__dirname + "/htmls/admin.html");
+});
+
+app.get('/detail', (req, res) => {
+    res.sendFile(__dirname + "/htmls/detail_page.html");
+});
+
 app.post('/api/posts', (req, res) => {
     const { title, content } = req.body;
 
@@ -53,6 +64,24 @@ app.post('/api/posts', (req, res) => {
 app.get('/api/posts', (req, res) => {
     Post.find({})
         .then(posts => res.json(posts))
+        .catch(err => {
+            console.log(err);
+            res.sendStatus(500);
+        });
+});
+
+app.get('/post/:id', (req, res) => {
+    const { id } = req.params;
+
+    Post.findById(id)
+        .then(post => {
+            if (!post) {
+                res.sendStatus(404);
+            } else {
+                console.log(post);
+                res.render('detail_page', { post }); // 수정된 부분
+            }
+        })
         .catch(err => {
             console.log(err);
             res.sendStatus(500);
