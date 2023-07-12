@@ -21,7 +21,8 @@ mongoose.connect(mongoURI, {useNewUrlParser: true, useUnifiedTopology: true})
 
 const Post = mongoose.model('post', {
     title: String,
-    content: String
+    content: String,
+    replies: [String]
 })
 
 
@@ -87,6 +88,33 @@ app.get('/post/:id', (req, res) => {
             res.sendStatus(500);
         });
 });
+
+app.post('/api/posts/:id/reply', (req, res) => {
+    const postId = req.params.id;
+    const { reply } = req.body;
+
+    Post.findById(postId)
+        .then(post => {
+            if(!post) {
+                return res.status(404).json({error:"게시물이 없음."});
+            }
+
+            if(!Array.isArray(post.replies)) {
+                post.replies = [];
+            }
+
+            post.replies.push( reply );
+
+            return post.save();
+        })
+        .then(savedPost => {
+            res.json(savedPost);
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json({error: '서버 오류 발생.'})
+        })
+})
 
 app.put('/api/posts/:id', (req, res) => {
     const { id } = req.params;

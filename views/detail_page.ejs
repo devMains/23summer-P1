@@ -13,7 +13,7 @@
     <body>
         <nav class="navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark">
             <div class="container-fluid">
-              <a class="navbar-brand" href="#">Navbar</a>
+              <a class="navbar-brand" href="/">Navbar</a>
               <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
               </button>
@@ -45,10 +45,63 @@
           </tbody>
         </table>
 
+        <form id="replyForm" style="margin: 20px;">
+          <div class="form-group">
+            <label for="reply">댓글</label>
+            <textarea class="form-control" id="reply" rows="3" placeholder="댓글을 입력하세요"></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary">댓글 작성</button>
+        </form>
+
+        <table id="replys">
+          <b style="margin: 20px;">댓글</b>
+          <% post.replies.forEach(function(reply, index) {%>
+            <p style="margin: 20px;"> <b><%= index + 1 %></b> <%= reply %> </p>
+          <% }); %>
+        </table>
         <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
         <script>
-            
+          
+          $('document').ready(function() {
+            var repliesContainer = $('#replys');
+
+            $('#replyForm').submit(function(event) {
+              event.preventDefault();
+
+              var reply = $("#reply").val();
+
+              if (reply === "") {
+                alert("댓글을 입력하세요.");
+                return;
+              }
+
+              var replyData = {
+                reply: reply
+              };
+
+              $.ajax({
+                url: "/api/posts/<%= post._id %>/reply",
+                method: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(replyData),
+                success: function(data) {
+                  console.log("댓글 작성 성공", data);
+                  addReplyToContainer(data.replies[data.replies.length - 1]);
+                },
+                error: function() {
+                  console.log("댓글 작성 실패");
+                }
+              });
+
+    $("#reply").val("");
+  });
+
+  function addReplyToContainer(reply) {
+    var replyElement = $("<p>").text(reply);
+    repliesContainer.append(replyElement);
+  }
+      });
+
         </script>
-        
     </body>
 </html>

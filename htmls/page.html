@@ -115,7 +115,7 @@
                   var tableBody = $("#postTable tbody");
                   tableBody.empty();
 
-                  data.forEach(function (post) {
+                  data.reverse().forEach(function (post) {
                     var button = $("<a style='color: blue; cursor: pointer'>");
                       button.text(post.title);
                       button.click(function () {
