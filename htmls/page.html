@@ -44,6 +44,9 @@
             <div class="form-group">
               <label for="content">내용</label>
               <textarea class="form-control" id="content" rows="3" placeholder="내용을 입력하세요"></textarea>
+              <input type="hidden" id="displayName" name="displayName">
+              <input type="hidden" id="userId" name="userId">
+              <!-- <input type="file" accept="image/*" id="postImage" name="postImage"></input> -->
             </div>
             <button type="submit" class="btn btn-primary">작성</button>
           </form>
@@ -64,6 +67,7 @@
 
         <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
         <script>
+
           $('document').ready(function () { 
             updatePostTable();
 
@@ -76,40 +80,61 @@
             // 글 작성 폼 제출 이벤트 핸들러
             $("#postForm").submit(function (event) {
               event.preventDefault();
-      
-              var title = $("#title").val();
-              var content = $("#content").val();
 
-              if (title == "" || content == "") {
-                alert("비워둘 수 없습니다.");
-                return;
-              }
-              
-      
-              var postData = {
-                title: title,
-                content: content,
-                postTime: timestamp
-              };
-      
               $.ajax({
-                url:"/api/posts",
-                method: "POST",
-                contentType: "application/json",
-                data: JSON.stringify(postData),
-                success: function () {
-                  console.log("success");
-                  updatePostTable();
-                },
-                error: function () {
-                  console.log("fail");
+              url: "/api/user",
+              method: "GET",
+              dataType: 'json',
+              success: function(data) {
+                const displayName = data.displayName;
+                const userId = data.userId;
+
+                var title = $("#title").val();
+                var content = $("#content").val();
+
+                if (title == "" || content == "") {
+                  alert("비워둘 수 없습니다.");
+                  return;
                 }
-              });
-      
-              // 폼 초기화
-              $("#title").val("");
-              $("#content").val("");
-              console.log("작성됨.");
+
+                if (data['login'] == 'fail') {
+                  alert("로그인을 해야합니다.")
+                  console.log(data);
+                  return;
+                }
+
+                $("#displayName").val(displayName);
+                $("#userId").val(userId);
+                var postData = {
+                  title: title,
+                  content: content,
+                  postTime: timestamp,
+                  displayName: displayName,
+                  userId: userId
+                };
+                $.ajax({
+                  url:"/api/posts",
+                  method: "POST",
+                  contentType: "application/json",
+                  data: JSON.stringify(postData),
+                  success: function () {
+                    console.log("success");
+                    updatePostTable();
+                  },
+                  error: function () {
+                    console.log("fail");
+                  }
+                });
+                $("#title").val("");
+                $("#content").val("");
+                $("#postImage").val("");
+                console.log("작성됨.");
+              },
+              error: function(){
+                console.log("정보 가져오기 실패");
+              }
+            })
+
             });
       
             // 글 테이블 업데이트 함수
@@ -126,11 +151,11 @@
 
                   data.reverse().forEach(function (post) {
                     var button = $("<a style='color: blue; cursor: pointer'>");
-                      button.text(post.title);
+                      button.text(post.title + " ("+ post.replies.length + ")");
                       button.click(function () {
                       goToPostDetail(post._id);
                     })
-                    var pTime = $("<p>");
+                    var pTime = $("<td>");
                     pTime.text(post.postTime);
 
                     var row = $("<tr>");

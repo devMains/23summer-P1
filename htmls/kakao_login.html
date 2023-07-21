@@ -1,82 +1,91 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta http-equiv="X-UA_Compatible" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta http-equiv="Compatible" content="no-cache"/>
-        <title>Document</title>
-        <link rel="stylesheet"
-            href = "bootstrap.min.css">
-        <script src="bootstrap.min.js"></script>
-        <script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
-    </head>
-    <body>
-        <nav class="navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark">
-            <div class="container-fluid">
-              <a class="navbar-brand" href="#">Navbar</a>
-              <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-              </button>
-              <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
-                  <li class="nav-item">
-                    <a class="nav-link" href="/">home</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="/profile">profile</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="#">Features</a>
-                  </li>
-                </ul>
-              </div>
-            </div>
-        </nav>
-        
-        <div style="margin: 30px;">
-            <b>카카오로 로그인 하기</b>
-            <a href="javascript:kakaoLogin();"><img src="kakao_login_img.png" alt="카카오계정 로그인" style="height: 45px; width:300px;"/></a>
-            <button type="button" class="btn btn-warning" onclick="javascript:kakaoLogout();">Logout</button>
-
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA_Compatible" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Compatible" content="no-cache" />
+    <title>Document</title>
+    <link rel="stylesheet" href="bootstrap.min.css" />
+    <script src="bootstrap.min.js"></script>
+    <script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">Navbar</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a class="nav-link" href="/">home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/profile">profile</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Features</a>
+            </li>
+          </ul>
         </div>
+      </div>
+    </nav>
 
+    <div style="margin: 30px;">
+      <b>카카오로 로그인 하기</b>
+      <a href="/auth/kakao"
+        ><img
+          src="kakao_login_img.png"
+          alt="카카오계정 로그인"
+          style="height: 45px; width: 300px;"
+      /></a>
+      <button
+        type="button"
+        class="btn btn-warning"
+        onclick="javascript:kakaoLogout();"
+      >
+        Logout
+      </button>
+    </div>
 
+    <script>
+      window.Kakao.init('50d56ef1dc41372917d10703fb6c26de');
 
-        <script>
-            window.Kakao.init('50d56ef1dc41372917d10703fb6c26de');
+      function kakaoLogin() {
+        window.Kakao.Auth.login({
+          scope: 'profile_nickname',
+          success: function (response) {
+            const { access_token } = response;
 
-            function kakaoLogin() {
-                window.Kakao.Auth.login({
-                    scope: 'profile_nickname', //동의항목 페이지에 있는 개인정보 보호 테이블의 활성화된 ID값을 넣습니다.
-                    success: function(response) {
-                        console.log(response) // 로그인 성공하면 받아오는 데이터
-                        window.Kakao.API.request({ // 사용자 정보 가져오기 
-                            url: '/v2/user/me',
-                            success: (res) => {
-                                const kakao_account = res.kakao_account;
-                                console.log(kakao.Auth.getAccessToken());
-                            }
-                        });
-                        window.location.href='/login' //리다이렉트 되는 코드
-                    },
-                    fail: function(error) {
-                        console.log(error);
-                    }
-                });
-            }
+            // 카카오 로그인 API 콜백 URL로 인증 코드 전달
+            window.location.href = `/auth/kakao/callback?code=${access_token}`;
+          },
+          fail: function (error) {
+            console.log(error);
+          },
+        });
+      }
 
-            function kakaoLogout() {
-    	        if (!Kakao.Auth.getAccessToken()) {
-		            console.log('Not logged in.');
-		            return;
-	            }
-	            Kakao.Auth.logout(function(response) {
-    		    alert(response +' logout');
-		        window.location.href='/'
-	    });
-};
-        </script>
-
-    </body>
+      function kakaoLogout() {
+        if (!Kakao.Auth.getAccessToken()) {
+          console.log('Not logged in.');
+          return;
+        }
+        Kakao.Auth.logout(function (response) {
+          alert(response + ' logout');
+          window.location.href = '/';
+        });
+      }
+    </script>
+  </body>
 </html>

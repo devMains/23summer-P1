@@ -44,6 +44,8 @@
               </tr>
           </tbody>
         </table>
+        <p style="margin: 20px;"><%= post.postTime %></p>
+        <p style="margin: 20px;"><%= post.displayName %></p>
 
         <form id="replyForm" style="margin: 20px;">
           <div class="form-group">
@@ -66,7 +68,7 @@
             var repliesContainer = $('#replys');
 
             $('#replyForm').submit(function(event) {
-
+              event.preventDefault();
               var reply = $("#reply").val();
 
               if (reply === "") {
@@ -74,8 +76,21 @@
                 return;
               }
 
+              function getCurrentDateTime() {
+                const curr = new Date();
+                const utc = curr.getTime() + (curr.getTimezoneOffset() * 60 * 1000);
+                const now = new Date(utc + (9 * 60 * 60 * 1000));
+                const year = now.getFullYear();
+                const month = (now.getMonth() + 1).toString().padStart(2, '0');
+                const day = now.getDate().toString().padStart(2, '0');
+                const hours = now.getHours().toString().padStart(2, '0');
+                const minutes = now.getMinutes().toString().padStart(2, '0');
+                const seconds = now.getSeconds().toString().padStart(2, '0');            
+                return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+              };
+
               var replyData = {
-                reply: reply
+                reply: `${reply} (${getCurrentDateTime()})`
               };
 
               $.ajax({
@@ -85,7 +100,8 @@
                 data: JSON.stringify(replyData),
                 success: function(data) {
                   console.log("댓글 작성 성공", data);
-                  addReplyToContainer(data.replies[data.replies.length - 1]);
+                  alert("댓글이 작성되었습니다.");
+                  location.reload();
                 },
                 error: function() {
                   console.log("댓글 작성 실패");
