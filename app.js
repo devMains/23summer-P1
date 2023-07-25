@@ -9,6 +9,7 @@ const querystring = require('querystring');
 const app = express();
 const port = 5000;
 const path = require('path');
+const { Types } = require('mongoose');
 
 const kakaoClientId = '50d56ef1dc41372917d10703fb6c26de';
 const kakaoCallbackURL = 'http://localhost:5000/auth/kakao/callback'
@@ -43,7 +44,10 @@ const Post = mongoose.model('post', {
 const User = mongoose.model('user', {
     userId: String,
     displayName: String,
-    point: Number
+    point: {
+        type: Number,
+        default: 0
+    }
 });
 
 passport.serializeUser(function (user, done) {
@@ -65,7 +69,7 @@ passport.use(new KakaoStrategy({
     callbackURL: kakaoCallbackURL
 },
 function (accessToken, refreshToken, profile, done) {
-    User.findOne({ kakaoId: profile.id })
+    User.findOne({ userId: profile.id })
         .then(existingUser => {
             if(existingUser) {
                 return done(null, existingUser);
@@ -112,7 +116,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/profile', (req, res) => {
-    res.render('profile', {user: req.user.displayName});
+    res.render('profile', {user: req.user});
 });
 
 app.get('/login', (req, res) => {
@@ -120,7 +124,7 @@ app.get('/login', (req, res) => {
        res.sendFile(__dirname + "/htmls/kakao_login.html"); 
     }
     else{
-        res.render('profile', {user: req.user.displayName});
+        res.render('profile', {user: req.user});
     }
     
 });
@@ -215,6 +219,36 @@ app.post('/api/posts/:id/reply', (req, res) => {
             res.status(500).json({error: '서버 오류 발생.'})
         })
 })
+
+app.get('/api/users', (req, res) => {
+    if (req.isAuthenticated() && req.user) {
+        res.json({
+            displayName: req.user.displayName,
+            userId: req.user.userId,
+            point: req.user.point
+        });
+    } else {
+        res.json({ 'login': 'fail' });
+    }
+});
+
+app.post('/api/user', (req, res) => {
+    const { userId, displayName, point } = req.body;
+
+    User.findOneAndUpdate({ userId: userId }, { displayName, $inc: { point: 10 } }, { new: true })
+        .then((updatedData) => {
+            if (!updatedData) {
+                console.log("해당 유저가 존재하지 않습니다.");
+                return res.status(404).send("해당 유저를 찾을수 없습니다.");
+            }
+            console.log("data updated", updatedData);
+            res.status(200).send("updated data");
+        })
+        .catch((err) => {
+            console.log("error update", err);
+            res.status(500).send("error update");
+        });
+});
 
 app.put('/api/posts/:id', (req, res) => {
     const { id } = req.params;

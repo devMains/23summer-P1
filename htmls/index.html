@@ -52,8 +52,31 @@
           <h2 style="margin: 20px; margin-top:30px;"><a href="/page">자유게시판</a></h2>
         </community>
 
-        <button type="button" class="btn btn-primary btn-lg" style="margin: 20px;">랜덤으로 뽑으러 가기!</button>
-
-    </script>
+        <button type="button" class="btn btn-primary btn-lg" style="margin: 20px;" onclick="getPoint();">랜덤으로 뽑으러 가기!</button>
     </body>
+    <script>
+      function getPoint() {
+        $.ajax({
+          url:'/api/users',
+          method: "GET",
+          dataType: 'json',
+          success: function(data) {
+            if(data.login === 'fail') {
+              alert('로그인을 해야합니다.');
+              return;
+            }
+            const userId = data.userId;
+            const displayName = data.displayName;
+            const point = data.point;
+
+            alert(`포인트는 : ${point} 입니다.`);
+            console.log(data);
+          },
+          error: function(xhr, status, error) {
+           console.log(xhr.responseText);
+           alert("서버오류");
+          }
+        })
+      }
+    </script>
 </html>

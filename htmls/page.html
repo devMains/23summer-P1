@@ -88,6 +88,7 @@
               success: function(data) {
                 const displayName = data.displayName;
                 const userId = data.userId;
+                const point = data.point;
 
                 var title = $("#title").val();
                 var content = $("#content").val();
@@ -102,6 +103,28 @@
                   console.log(data);
                   return;
                 }
+
+                const userData = {
+                  userId: userId,
+                  displayName: displayName,
+                  point: point ,
+                }
+
+                console.log(point);
+                
+                const xhr = new XMLHttpRequest();
+                xhr.open("POST", "/api/user", true);
+                xhr.setRequestHeader('Content-Type', 'application/json');
+                xhr.onreadystatechange = function() {
+                  if(xhr.readyState === 4) {
+                    if(xhr.status === 200) {
+                      console.log("data updated/html");
+                    } else {
+                      console.error("error update", xhr.responseText);
+                    }
+                  } 
+                };
+                xhr.send(JSON.stringify(userData));
 
                 $("#displayName").val(displayName);
                 $("#userId").val(userId);
