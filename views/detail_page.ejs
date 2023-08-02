@@ -9,6 +9,8 @@
         <link rel="stylesheet"
             href = "/bootstrap.min.css">
         <script src="/bootstrap.min.js"></script>
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9129708563246968"
+     crossorigin="anonymous"></script>
     </head>
     <body>
         <nav class="navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark">
@@ -42,6 +44,11 @@
               <tr>
                   <td><p style="margin: 20px;"><%= post.content %></p></td>
               </tr>
+              <% if (post.imagePath) { %>
+                <tr>
+                  <td><img src="<%= post.imagePath.replace('public', '') %>" alt="Post Image"></td>
+                </tr>
+              <% } %>
           </tbody>
         </table>
         <p style="margin: 20px;"><%= post.postTime %></p>

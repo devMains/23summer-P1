@@ -10,6 +10,7 @@ const app = express();
 const port = 5000;
 const path = require('path');
 const { Types } = require('mongoose');
+const multer = require('multer');
 
 const kakaoClientId = '50d56ef1dc41372917d10703fb6c26de';
 const kakaoCallbackURL = 'http://localhost:5000/auth/kakao/callback'
@@ -17,6 +18,7 @@ const kakaoCallbackURL = 'http://localhost:5000/auth/kakao/callback'
 app.use(express.static(path.join(__dirname, 'css')));
 app.use(express.static('js'));
 app.use(express.static('img'));
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.engine('html', require('ejs').renderFile);
@@ -26,6 +28,19 @@ app.use(express.json());
 app.use(session({ secret : 'XgeEpm943y1NDd6movh9JKknszOOyoeR', resave: true, saveUninitialized: true}))
 app.use(passport.initialize());
 app.use(passport.session());
+
+const storage = multer.diskStorage({
+    destination: function(req, file, cb) {
+        cb(null, 'public/images')
+    },
+    filename: function(req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+    }
+})
+
+const upload = multer({storage: storage});
+
 
 const mongoURI = "mongodb+srv://mainsdev:1q2w3e4r!@cluster0.v3mragw.mongodb.net/?retryWrites=true&w=majority"
 mongoose.connect(mongoURI, {useNewUrlParser: true, useUnifiedTopology: true})
@@ -38,7 +53,8 @@ const Post = mongoose.model('post', {
     replies: [String],
     postTime: String,
     displayName: String,
-    userId: String
+    userId: String,
+    imagePath: String
 });
 
 const User = mongoose.model('user', {
@@ -141,11 +157,13 @@ app.get('/detail', (req, res) => {
     res.sendFile(__dirname + "/htmls/detail_page.html");
 });
 
-app.post('/api/posts', (req, res) => {
+app.post('/api/posts', upload.single('postImage') ,(req, res) => {
     const { title, content, postTime} = req.body;
     const { displayName, userId } = req.body;
 
-    const newPost = new Post({title, content, postTime: getCurrentDateTime(), displayName, userId});
+    const imagePath = req.file ? req.file.path : null;
+
+    const newPost = new Post({title, content, postTime: getCurrentDateTime(), displayName, userId, imagePath});
     newPost.save()
         .then(posts => res.json(posts))
         .catch(err => {

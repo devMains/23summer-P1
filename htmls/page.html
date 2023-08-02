@@ -46,7 +46,10 @@
               <textarea class="form-control" id="content" rows="3" placeholder="내용을 입력하세요"></textarea>
               <input type="hidden" id="displayName" name="displayName">
               <input type="hidden" id="userId" name="userId">
-              <!-- <input type="file" accept="image/*" id="postImage" name="postImage"></input> -->
+            </div>
+            <div>
+              <label for="postImage">이미지 업로드</label>
+              <input type="file" class="form-control" id="postImage" name="postImage">
             </div>
             <button type="submit" class="btn btn-primary">작성</button>
           </form>
@@ -128,18 +131,22 @@
 
                 $("#displayName").val(displayName);
                 $("#userId").val(userId);
-                var postData = {
-                  title: title,
-                  content: content,
-                  postTime: timestamp,
-                  displayName: displayName,
-                  userId: userId
-                };
+
+                var postImage = $("#postImage")[0].files[0];
+
+                var formData = new FormData();
+                formData.append("title", title);
+                formData.append("content", content);
+                formData.append("postImage", postImage);
+                formData.append("displayName", displayName);
+                formData.append("userId", userId);
+
                 $.ajax({
                   url:"/api/posts",
                   method: "POST",
-                  contentType: "application/json",
-                  data: JSON.stringify(postData),
+                  contentType: false,
+                  processData: false,
+                  data: formData,
                   success: function () {
                     console.log("success");
                     updatePostTable();
@@ -184,6 +191,16 @@
                     var row = $("<tr>");
                     row.append($('<td>').append(button));
                     row.append(pTime);
+
+                    if (post.imagePath) {
+                      var img = $("<img>");
+                      img.attr("scr", post.imagePath);
+                      img.attr("alt", "Post Image");
+                      img.attr("width", "100");
+                      img.attr("height", "100");
+                      row.append($("<td>").append(img));
+                    }
+
                     tableBody.append(row);
                   });
                 },

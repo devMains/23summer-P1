@@ -37,9 +37,19 @@
         <b>로그인 된 이름 : <%= user.displayName %></b>
         <p>포인트 : <%= user.point %></p>
 
+        <form id="kakaoLink" style="margin: 10px; padding:5px;">
+          <div class="form-group">
+            <input type="text" id="links" placeholder="오픈채팅 링크를 입력">
+          </div>
+          <button type="submit" class="btn btn-primary">저장</button>
+        </form>
+
         <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
         <script>
+          $("#kakaoLink").submit(function(event) {
+            event.preventDefault();
 
+          })
         </script>
     </body>
 </html>
