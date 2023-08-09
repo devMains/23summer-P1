@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA_Compatible" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="Compatible" content="no-cache"/>
+        <title>Document</title>
+        <link rel="stylesheet"
+            href = "bootstrap.min.css">
+            <script src="bootstrap.min.js"></script>
+    </head>
+    <body>
+        <nav class="navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark">
+            <div class="container-fluid">
+              <a class="navbar-brand" href="/">Navbar</a>
+              <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+              </button>
+              <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                  <li class="nav-item">
+                    <a class="nav-link" href="/">home</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="/profile">profile</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="#">Features</a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+        </nav>
+
+        <div id="score">
+            <div>
+
+            </div>
+            <p>딸깍 버튼을 누르면 50% 확률로 포인트가 1.5배 혹은 절반 됩니다.</p>
+
+        </div>
+
+        <button class="btn btn-primary btn-lg" style="margin: 20px;" onclick="dobak()">딸깍</button>
+
+
+    </body>
+    <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
+    <script>
+        $('document').ready(function() {
+            getPoint()
+        })
+        function getPoint() {
+            $.ajax({
+            url:'/api/users',
+            method: "GET",
+            dataType: 'json',
+            success: function(data) {
+                
+                const userId = data.userId;
+                const displayName = data.displayName;
+                const point = data.point;
+                
+                var row = $("#score div");
+                var text = $("<p>");
+                text.text(point);
+                row.append(text);
+            },
+            error: function(xhr, status, error) {
+                console.log(xhr.responseText);
+                alert("서버오류");
+            }
+            })
+        }
+        function dobak() {
+            $.ajax({
+                url: '/api/users',
+                method: "GET",
+                dataType: 'json',
+                success: function(data) {
+                    const userId = data.userId;
+                    const displayName = data.displayName;
+                    const point = data.point;
+
+                    console.log(data);
+
+
+                    const result = Math.random();
+                    let updatedPoint;
+
+                    if (result < 0.5) {
+                        updatedPoint = point / 2;
+                        alert("실패 !");
+                    } else {
+                        updatedPoint = point * 1.5;
+                        alert("성공 !");
+                    }
+
+                    const updateData = {
+                        userId: userId,
+                        displayName: displayName,
+                        point: parseInt(updatedPoint)
+                    };
+
+                    $.ajax({
+                        url: '/api/user',
+                        method: "POST",
+                        dataType: 'json',
+                        data: updateData, // POST 요청으로 보낼 데이터 추가
+                        success: function(updatedData) {
+                            console.log("업데이트 성공");
+                        },
+                        error: function() {
+                            console.log("error");
+                        }
+                    });
+                    location.reload();
+                },
+                error: function(xhr, status, error) {
+                    console.log(xhr.responseText);
+                    alert("서버오류");
+                }
+            });
+        }
+    </script>
+</html>

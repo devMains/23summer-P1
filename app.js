@@ -127,8 +127,10 @@ app.get('/api/user', (req, res) => {
 app.get('/', (req, res) => {
     if (req.isAuthenticated()){
         console.log("로그인 성공." + req.user.displayName);
+        res.sendFile( __dirname + "/htmls/login_index.html");
+    } else{
+        res.sendFile( __dirname + "/htmls/index.html");
     }
-    res.sendFile( __dirname + "/htmls/index.html");
 });
 
 app.get('/profile', (req, res) => {
@@ -146,16 +148,35 @@ app.get('/login', (req, res) => {
 });
 
 app.get('/page', (req, res) => {
-    res.sendFile(__dirname + "/htmls/page.html");
+    if (req.isAuthenticated()){
+        res.sendFile( __dirname + "/htmls/login_page.html");
+    } else{
+        res.sendFile( __dirname + "/htmls/page.html");
+    }
 });
 
 app.get('/delete', (req, res) => {
     res.sendFile(__dirname + "/htmls/admin.html");
 });
 
-app.get('/detail', (req, res) => {
-    res.sendFile(__dirname + "/htmls/detail_page.html");
+app.get('/game', (req, res) => {
+    res.sendFile(__dirname + "/htmls/game.html");
 });
+
+app.get('/api/rank', (req, res) => {
+        getUser()
+        .then(users => {
+            console.log(users);
+            let userData = users;
+            const extractedData = userData.map(obj => ({
+                displayName: obj.displayName,
+                point: obj.point
+            }));
+            res.json(extractedData);
+        }).catch(error => {
+            console.error(error);
+        });
+})
 
 app.post('/api/posts', upload.single('postImage') ,(req, res) => {
     const { title, content, postTime} = req.body;
@@ -165,7 +186,7 @@ app.post('/api/posts', upload.single('postImage') ,(req, res) => {
 
     const newPost = new Post({title, content, postTime: getCurrentDateTime(), displayName, userId, imagePath});
     newPost.save()
-        .then(posts => res.json(posts))
+        .then(posts => res.json(posts), increaseUserPoint(userId, displayName))
         .catch(err => {
             console.log(err);
             res.sendStatus(500);
@@ -253,7 +274,7 @@ app.get('/api/users', (req, res) => {
 app.post('/api/user', (req, res) => {
     const { userId, displayName, point } = req.body;
 
-    User.findOneAndUpdate({ userId: userId }, { displayName, $inc: { point: 10 } }, { new: true })
+    User.findOneAndUpdate({ userId: userId }, { displayName, point }, { new: true })
         .then((updatedData) => {
             if (!updatedData) {
                 console.log("해당 유저가 존재하지 않습니다.");
@@ -295,3 +316,35 @@ app.delete('/api/posts/:id', (req, res) => {
 app.listen(port, () => {
     console.log(`서버 실행... http://localhost:${port}`);
 });
+
+async function getUser() {
+    try {
+        const users = await User.find().exec();
+        return users;
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+
+function increaseUserPoint(userId, displayName) {
+    User.findOneAndUpdate(
+        {userId: userId },
+        {displayName , $inc: { point: 10}},
+        {new: true}
+    )
+    .then(updateUser => {
+        if(!updateUser) {
+            console.log("해당 유저가 없습니다.");
+        } else {
+            console.log("포인트 값 증가 성공", updateUser);
+        }
+    })
+    .catch(err => {
+        console.log("포인트 증가 오류", err);
+    })
+}
+
+module.exports = {
+    increaseUserPoint: increaseUserPoint
+}
