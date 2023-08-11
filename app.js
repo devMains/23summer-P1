@@ -13,7 +13,7 @@ const { Types } = require('mongoose');
 const multer = require('multer');
 
 const kakaoClientId = '50d56ef1dc41372917d10703fb6c26de';
-const kakaoCallbackURL = 'http://localhost:5000/auth/kakao/callback'
+const kakaoCallbackURL = 'http://batmmunity.site/auth/kakao/callback'
 
 app.use(express.static(path.join(__dirname, 'css')));
 app.use(express.static('js'));
@@ -274,13 +274,13 @@ app.get('/api/users', (req, res) => {
 app.post('/api/user', (req, res) => {
     const { userId, displayName, point } = req.body;
 
-    User.findOneAndUpdate({ userId: userId }, { displayName, point }, { new: true })
+    User.findOneAndUpdate({ userId: userId }, { displayName, point}, { new: true })
         .then((updatedData) => {
             if (!updatedData) {
                 console.log("해당 유저가 존재하지 않습니다.");
                 return res.status(404).send("해당 유저를 찾을수 없습니다.");
             }
-            console.log("data updated", updatedData);
+            console.log("data updated user", updatedData);
             res.status(200).send("updated data");
         })
         .catch((err) => {

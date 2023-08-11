@@ -112,7 +112,7 @@
                     displayName: displayName,
                     point: point
                   }
-                  
+
                   const xhr = new XMLHttpRequest();
                   xhr.open("POST", "/api/user", true);
                   xhr.setRequestHeader('Content-Type', 'application/json');
@@ -152,19 +152,6 @@
                     error: function () {
                       console.log("fail");
                     }
-                  });
-
-                  $.ajax({
-                      url: '/api/user',
-                      method: "POST",
-                      dataType: 'json',
-                      data: userData, // POST 요청으로 보낼 데이터 추가
-                      success: function(userData) {
-                          console.log("업데이트 성공");
-                      },
-                      error: function() {
-                          console.log("error");
-                      }
                   });
 
                   $("#title").val("");
